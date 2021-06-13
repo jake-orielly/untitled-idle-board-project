@@ -8,6 +8,10 @@
           Points: {{points}}
         </p>
         <hr>
+        <StructureShop 
+          :structures="structures"
+          @buy="buyStructure"
+        />
       </div>
       <div>
         <table
@@ -24,9 +28,15 @@
                 :key="`cell-${colVal}-${rowVal}`"
               >
                 <component 
-                  :is="'ClickerButton'"
+                  :is="board[colVal][rowVal]"
                   @gainPoints="gainPoints"
                 />
+                <div
+                  v-if="!board[colVal][rowVal] && placing"
+                  class="empty-space"
+                >
+                  {{placing.img}}
+                </div>
               </td>
             </tr>
           </tbody>
@@ -37,23 +47,68 @@
   </div>
 </template>
 <script>
+class Generator {
+  static name = "Generator";
+  static img = "G";
+  
+  static price(owned) {
+    return 10 + parseInt(Math.pow(2.5 * owned, 1.5));
+  }
+
+  tick() {
+    console.log("1")
+  }
+}
+
 import ClickerButton from './ClickerButton'
+import StructureShop from './StructureShop'
 export default {
   name: 'GameContainer',
   components: {
-    ClickerButton
+    ClickerButton,
+    StructureShop
   },
   data() {
     return {
       rows: 2,
       columns: 2,
       board:[],
-      points: 0
+      points: 30,
+      structures: [
+        this.structureRepresentation(Generator)
+      ],
+      placing: undefined
     }
+  },
+  created() {
+    for (let i = 0; i < this.rows; i++) {
+      this.board.push([]);
+      for (let j = 0; j < this.columns; j++)
+        this.board[i][j] = undefined;
+    }
+    this.board[0][0] = "ClickerButton";
   },
   methods: {
     gainPoints(val) {
       this.points += val;
+    },
+    buyStructure(structure) {
+      let representation = this.structures.filter(
+        s => s.name == structure.name
+      )[0];
+      if (this.points > representation.price(representation.owned)) {
+        this.$set(representation,"owned", representation.owned + 1);
+        this.placing = representation.class;
+      }
+    },
+    structureRepresentation(structure) {
+      return {
+        price: structure.price,
+        name: structure.name,
+        class: structure,
+        cost: 10,
+        owned: 0
+      }
     }
   }
 }
@@ -68,6 +123,7 @@ export default {
     border: 1px solid black;
     width: 2rem;
     height: 2rem;
+    padding: 0;
   }
 }
 
@@ -82,5 +138,14 @@ hr {
   border:none;
   width: 80%;
   margin-left: 0%;
+}
+
+.empty-space {
+  color: white;
+  cursor: pointer;
+
+  &:hover {
+    color: grey;
+  }
 }
 </style>
