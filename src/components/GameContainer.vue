@@ -30,6 +30,7 @@
                 <component 
                   :is="board[colVal][rowVal]"
                   @gainPoints="gainPoints"
+                  :tick="tick"
                 />
                 <div
                   v-if="!board[colVal][rowVal] && placing"
@@ -59,11 +60,13 @@ const generator = {
 };
 
 import ClickerButton from './ClickerButton'
+import Generator from './Generator'
 import StructureShop from './StructureShop'
 export default {
   name: 'GameContainer',
   components: {
     ClickerButton,
+    Generator,
     StructureShop
   },
   data() {
@@ -72,6 +75,8 @@ export default {
       columns: 2,
       board:[],
       points: 30,
+      tick:0,
+      tickInterval:undefined,
       structures: [
         generator
       ],
@@ -85,6 +90,11 @@ export default {
         this.board[i][j] = undefined;
     }
     this.board[0][0] = "ClickerButton";
+    this.tickInterval = setInterval(
+      () => {
+        this.tick++;
+      }, 1000
+    );
   },
   methods: {
     gainPoints(val) {
@@ -100,7 +110,7 @@ export default {
     },
     placeStructure(x,y) {
       let newRow = [...this.board[x]];
-      newRow[y] = "ClickerButton";
+      newRow[y] = this.placing.name;
       this.$set(this.board, x, newRow);
       this.placing = undefined;
     }
