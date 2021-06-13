@@ -26,6 +26,7 @@
               <td
                 v-for="(col, colVal) in columns"
                 :key="`cell-${colVal}-${rowVal}`"
+                @click="selectStructure(colVal, rowVal)"
               >
                 <component 
                   :is="board[colVal][rowVal]"
@@ -44,7 +45,11 @@
           </tbody>
         </table>
       </div>
-      <div></div>
+      <div>
+        <StructureDetails 
+          :structure="selectedStructure"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -61,12 +66,15 @@ const generator = {
 
 import ClickerButton from './ClickerButton'
 import Generator from './Generator'
+import StructureDetails from './StructureDetails'
 import StructureShop from './StructureShop'
+
 export default {
   name: 'GameContainer',
   components: {
     ClickerButton,
     Generator,
+    StructureDetails,
     StructureShop
   },
   data() {
@@ -80,7 +88,8 @@ export default {
       structures: [
         generator
       ],
-      placing: undefined
+      placing: undefined,
+      selectedStructure: undefined
     }
   },
   created() {
@@ -108,6 +117,9 @@ export default {
         this.placing = structure;
       }
     },
+    selectStructure(x,y) {
+      this.selectedStructure = {name:this.board[x][y]};
+    },
     placeStructure(x,y) {
       let newRow = [...this.board[x]];
       newRow[y] = this.placing.name;
@@ -133,7 +145,7 @@ export default {
 
 .grid-container {
   display: grid;
-  grid-template-columns: 15% auto 15%;
+  grid-template-columns: 15% 15% 15%;
 }
 
 hr {
