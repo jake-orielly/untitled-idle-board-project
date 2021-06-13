@@ -8,7 +8,7 @@
       <p>{{structure.name}}</p>
       <p>{{structure.price(structure.owned)}}</p>
       <button
-        @click="buy(structure.class)"
+        @click="buy(structure)"
       >Buy</button>
     </div>
   </div>

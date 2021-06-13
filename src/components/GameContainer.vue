@@ -33,6 +33,7 @@
                 />
                 <div
                   v-if="!board[colVal][rowVal] && placing"
+                  @click="placeStructure(colVal, rowVal)"
                   class="empty-space"
                 >
                   {{placing.img}}
@@ -47,18 +48,15 @@
   </div>
 </template>
 <script>
-class Generator {
-  static name = "Generator";
-  static img = "G";
-  
-  static price(owned) {
+const generator = {
+  name: "Generator",
+  price: (owned) => {
     return 10 + parseInt(Math.pow(2.5 * owned, 1.5));
-  }
-
-  tick() {
-    console.log("1")
-  }
-}
+  },
+  img: "G",
+  cost: 10,
+  owned: 0
+};
 
 import ClickerButton from './ClickerButton'
 import StructureShop from './StructureShop'
@@ -75,7 +73,7 @@ export default {
       board:[],
       points: 30,
       structures: [
-        this.structureRepresentation(Generator)
+        generator
       ],
       placing: undefined
     }
@@ -93,22 +91,18 @@ export default {
       this.points += val;
     },
     buyStructure(structure) {
-      let representation = this.structures.filter(
-        s => s.name == structure.name
-      )[0];
-      if (this.points > representation.price(representation.owned)) {
-        this.$set(representation,"owned", representation.owned + 1);
-        this.placing = representation.class;
+      let structPrice = structure.price(structure.owned);
+      if (this.points > structPrice) {
+        this.points -= structPrice;
+        this.$set(structure,"owned", structure.owned + 1);
+        this.placing = structure;
       }
     },
-    structureRepresentation(structure) {
-      return {
-        price: structure.price,
-        name: structure.name,
-        class: structure,
-        cost: 10,
-        owned: 0
-      }
+    placeStructure(x,y) {
+      let newRow = [...this.board[x]];
+      newRow[y] = "ClickerButton";
+      this.$set(this.board, x, newRow);
+      this.placing = undefined;
     }
   }
 }
