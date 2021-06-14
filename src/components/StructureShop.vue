@@ -37,6 +37,6 @@ export default {
 <style lang="less" scoped>
 .shop-container {
   display: grid;
-  grid-template-columns: 40% 20% 20%;
+  grid-template-columns: 50% 15% 15%;
 }
 </style>

@@ -55,6 +55,15 @@
   </div>
 </template>
 <script>
+const clickerButton = {
+  name: "ClickerButton",
+  price: (owned) => {
+    return 3 + parseInt(Math.pow(1.5 * owned, 1.25)); 
+  },
+  img: ":)",
+  owned: 0
+}
+
 const generator = {
   name: "Generator",
   price: (owned) => {
@@ -123,6 +132,7 @@ export default {
       tick:0,
       tickInterval:undefined,
       structures: [
+        clickerButton,
         generator,
         buffer,
         clickBuffer
@@ -140,7 +150,7 @@ export default {
           buffs:[]
         };
     }
-    this.board[0][1].structure = "Generator";
+    this.board[0][0].structure = "ClickerButton";
     this.tickInterval = setInterval(
       () => {
         this.tick++;
