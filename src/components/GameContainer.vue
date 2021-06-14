@@ -47,8 +47,28 @@
         </table>
       </div>
       <div>
+        <p>
+          <span
+            @click="selectRightTab('details')"
+            class="tabSelection"
+          >
+            Selection
+          </span>
+          <span
+            @click="selectRightTab('upgrades')"
+            class="tabSelection"
+          >
+            Upgrades
+          </span>
+        </p>
+        <hr>
         <StructureDetails 
+          v-if="rightTab == 'details'"
           :structure="selectedStructure"
+        />
+        <UpgradesTab
+          v-else-if="rightTab == 'upgrades'"
+          :upgrades="upgrades"
         />
       </div>
     </div>
@@ -112,6 +132,7 @@ import ClickerButton from './ClickerButton'
 import Generator from './Generator'
 import StructureDetails from './StructureDetails'
 import StructureShop from './StructureShop'
+import UpgradesTab from './UpgradesTab'
 
 export default {
   name: 'GameContainer',
@@ -121,7 +142,8 @@ export default {
     ClickerButton,
     Generator,
     StructureDetails,
-    StructureShop
+    StructureShop,
+    UpgradesTab
   },
   data() {
     return {
@@ -139,7 +161,9 @@ export default {
       ],
       placing: undefined,
       placingCost: undefined,
-      selectedStructure: undefined
+      selectedStructure: undefined,
+      rightTab: "details",
+      upgrades: []
     }
   },
   created() {
@@ -186,6 +210,9 @@ export default {
         name: this.board[x][y].structure,
         action: "Selected"
       };
+    },
+    selectRightTab(tab) {
+      this.rightTab = tab;
     },
     placeStructure(x,y) {
       let newRow = [...this.board[x]];
@@ -249,5 +276,11 @@ hr {
   &:hover {
     color: grey;
   }
+}
+
+.tabSelection {
+  text-decoration: underline;
+  cursor: pointer;
+  margin-right: 1rem;
 }
 </style>
