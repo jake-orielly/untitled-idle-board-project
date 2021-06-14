@@ -92,6 +92,7 @@ import Buffer from './Buffer'
 import ClickBuffer from './ClickBuffer'
 import ClickerButton from './ClickerButton'
 import Generator from './Generator'
+import LuckyClicker from './LuckyClicker'
 import StructureDetails from './StructureDetails'
 import StructureShop from './StructureShop'
 import UpgradesTab from './UpgradesTab'
@@ -103,6 +104,7 @@ export default {
     ClickBuffer,
     ClickerButton,
     Generator,
+    LuckyClicker,
     StructureDetails,
     StructureShop,
     UpgradesTab
@@ -112,7 +114,7 @@ export default {
       rows: 2,
       columns: 2,
       board:[],
-      points: 30,
+      points: 0,
       tick:0,
       tickInterval:undefined,
       structures: structureRepresentations,
@@ -160,7 +162,7 @@ export default {
           buffs:[]
         };
     }
-    this.board[0][0].structure = "ClickerButton";
+    this.board[0][0].structure = "LuckyClicker";
     this.tickInterval = setInterval(
       () => {
         this.tick++;

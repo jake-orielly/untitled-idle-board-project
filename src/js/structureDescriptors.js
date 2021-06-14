@@ -42,11 +42,21 @@ const clickBuffer = {
     buffRange: 1
 }
 
+const luckyClicker = {
+    name: "LuckyClicker",
+    price: (owned) => {
+        return 45 + parseInt(Math.pow(4.5 * owned, 2));
+    },
+    img: "LC",
+    owned: 0
+}
+
 const structureRepresentations = [
     clickerButton,
     generator,
     buffer,
-    clickBuffer
+    clickBuffer,
+    luckyClicker
 ];
 
 export default structureRepresentations;
