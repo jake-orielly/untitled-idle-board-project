@@ -9,7 +9,9 @@
       <p>{{structure.price(structure.owned)}}</p>
       <button
         @click="buy(structure)"
-      >Buy</button>
+      >
+        Buy
+      </button>
     </div>
   </div>
 </template>
@@ -38,5 +40,10 @@ export default {
 .shop-container {
   display: grid;
   grid-template-columns: 50% 15% 15%;
+}
+
+button {
+  height: 1.5rem;
+  margin: auto;
 }
 </style>

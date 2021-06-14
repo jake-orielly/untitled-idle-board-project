@@ -138,6 +138,7 @@ export default {
         clickBuffer
       ],
       placing: undefined,
+      placingCost: undefined,
       selectedStructure: undefined
     }
   },
@@ -168,15 +169,22 @@ export default {
     },
     buyStructure(structure) {
       let structPrice = structure.price(structure.owned);
+      if (this.placingCost)
+        this.points += this.placingCost;
       if (this.points > structPrice) {
         this.points -= structPrice;
-        this.$set(structure,"owned", structure.owned + 1);
         this.placing = structure;
+        this.placingCost = structPrice;
+        this.selectedStructure = {
+          name: structure.name,
+          action: "Buying"
+        };
       }
     },
     selectStructure(x,y) {
       this.selectedStructure = {
-        name: this.board[x][y].structure
+        name: this.board[x][y].structure,
+        action: "Selected"
       };
     },
     placeStructure(x,y) {
@@ -185,7 +193,9 @@ export default {
       if (this.placing.buffFunc)
         this.addBuffs(x,y,this.placing.buffFunc);
       this.$set(this.board, x, newRow);
+      this.$set(this.placing,"owned", this.placing.owned + 1);
       this.placing = undefined;
+      this.placingCost = undefined;
     },
     addBuffs(x, y, buffFunc) {
       let newX, newY;

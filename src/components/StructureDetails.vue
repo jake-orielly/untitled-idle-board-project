@@ -1,16 +1,17 @@
 <template>
   <div>
-    <p>Selected: 
-      <span
-        v-if="structure"
-      >
+    <p
+      v-if="structure"
+    >
+      {{structure.action}}: 
+      <span>
         {{structure.name}}
       </span>
-      <span
-        v-else
-      >
-        None
-      </span>
+    </p>
+    <p
+      v-else
+    >
+      Nothing selected
     </p>
   </div>
 </template>
