@@ -29,12 +29,12 @@
                 @click="selectStructure(colVal, rowVal)"
               >
                 <component 
-                  :is="board[colVal][rowVal]"
-                  @gainPoints="gainPoints"
+                  :is="board[colVal][rowVal].structure"
                   :tick="tick"
+                  @gainPoints="(val) => gainPoints(colVal, rowVal, val)"
                 />
                 <div
-                  v-if="!board[colVal][rowVal] && placing"
+                  v-if="!board[colVal][rowVal].structure && placing"
                   @click="placeStructure(colVal, rowVal)"
                   class="empty-space"
                 >
@@ -60,10 +60,30 @@ const generator = {
     return 10 + parseInt(Math.pow(2.5 * owned, 1.5));
   },
   img: "G",
-  cost: 10,
   owned: 0
 };
 
+const buffer = {
+  name: "Buffer",
+  price: (owned) => {
+    return 15 + parseInt(Math.pow(3.5 * owned, 1.75));
+  },
+  img: "B",
+  owned: 0,
+  buff: (val) => {
+    return val * 2;
+  },
+  buffRange: 1
+}
+
+const cardinalDirs = [
+  [0,1],
+  [1,0],
+  [0,-1],
+  [-1,0]
+];
+
+import Buffer from './Buffer'
 import ClickerButton from './ClickerButton'
 import Generator from './Generator'
 import StructureDetails from './StructureDetails'
@@ -72,6 +92,7 @@ import StructureShop from './StructureShop'
 export default {
   name: 'GameContainer',
   components: {
+    Buffer,
     ClickerButton,
     Generator,
     StructureDetails,
@@ -86,7 +107,8 @@ export default {
       tick:0,
       tickInterval:undefined,
       structures: [
-        generator
+        generator,
+        buffer
       ],
       placing: undefined,
       selectedStructure: undefined
@@ -96,9 +118,12 @@ export default {
     for (let i = 0; i < this.rows; i++) {
       this.board.push([]);
       for (let j = 0; j < this.columns; j++)
-        this.board[i][j] = undefined;
+        this.board[i][j] = {
+          structure: undefined,
+          buffs:[]
+        };
     }
-    this.board[0][0] = "ClickerButton";
+    this.board[0][0].structure = "ClickerButton";
     this.tickInterval = setInterval(
       () => {
         this.tick++;
@@ -106,7 +131,9 @@ export default {
     );
   },
   methods: {
-    gainPoints(val) {
+    gainPoints(x,y, val) {
+      for (let buff of this.board[x][y].buffs)
+        val = buff(val);
       this.points += val;
     },
     buyStructure(structure) {
@@ -118,13 +145,29 @@ export default {
       }
     },
     selectStructure(x,y) {
-      this.selectedStructure = {name:this.board[x][y]};
+      this.selectedStructure = {
+        name: this.board[x][y].structure
+      };
     },
     placeStructure(x,y) {
       let newRow = [...this.board[x]];
-      newRow[y] = this.placing.name;
+      newRow[y].structure = this.placing.name;
+      if (this.placing.buff)
+        this.addBuffs(x,y,this.placing.buff);
       this.$set(this.board, x, newRow);
       this.placing = undefined;
+    },
+    addBuffs(x, y, buff) {
+      let newX, newY;
+      for (let dir of cardinalDirs) {
+        newX = x + dir[0];
+        newY = y + dir[1]; 
+        if (this.onBoard(newX, newY))
+          this.board[newX][newY].buffs.push(buff)
+      }
+    },
+    onBoard(x,y) {
+      return x >= 0 && y >= 0 && x < this.rows && y < this.columns;
     }
   }
 }
