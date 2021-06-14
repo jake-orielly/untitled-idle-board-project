@@ -8,12 +8,6 @@
 
 export default {
   name: 'Buffer',
-  props: {
-    tick: {
-      type: Number,
-      required: true
-    }
-  },
   data() {
     return {}
   }

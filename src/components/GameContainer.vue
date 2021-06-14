@@ -5,7 +5,7 @@
     >
       <div>
         <p>
-          Points: {{points}}
+          Points: {{parseInt(points)}}
         </p>
         <hr>
         <StructureShop 
@@ -30,6 +30,7 @@
               >
                 <component 
                   :is="board[colVal][rowVal].structure"
+                  :ref="'structure-' + colVal + '-' + rowVal"
                   :tick="tick"
                   @gainPoints="(val) => gainPoints(colVal, rowVal, val)"
                 />
@@ -70,8 +71,21 @@ const buffer = {
   },
   img: "B",
   owned: 0,
-  buff: (val) => {
+  buffFunc: (val) => {
     return val * 2;
+  },
+  buffRange: 1
+}
+
+const clickBuffer = {
+  name: "ClickBuffer",
+  price: (owned) => {
+    return 25 + parseInt(Math.pow(3.5 * owned, 1.85));
+  },
+  img: "CB",
+  owned: 0,
+  buffFunc: (val, parent) => {
+    return val * parent.buffVal;
   },
   buffRange: 1
 }
@@ -84,6 +98,7 @@ const cardinalDirs = [
 ];
 
 import Buffer from './Buffer'
+import ClickBuffer from './ClickBuffer'
 import ClickerButton from './ClickerButton'
 import Generator from './Generator'
 import StructureDetails from './StructureDetails'
@@ -93,6 +108,7 @@ export default {
   name: 'GameContainer',
   components: {
     Buffer,
+    ClickBuffer,
     ClickerButton,
     Generator,
     StructureDetails,
@@ -108,7 +124,8 @@ export default {
       tickInterval:undefined,
       structures: [
         generator,
-        buffer
+        buffer,
+        clickBuffer
       ],
       placing: undefined,
       selectedStructure: undefined
@@ -123,7 +140,7 @@ export default {
           buffs:[]
         };
     }
-    this.board[0][0].structure = "ClickerButton";
+    this.board[0][1].structure = "Generator";
     this.tickInterval = setInterval(
       () => {
         this.tick++;
@@ -132,8 +149,11 @@ export default {
   },
   methods: {
     gainPoints(x,y, val) {
-      for (let buff of this.board[x][y].buffs)
-        val = buff(val);
+      let parent;
+      for (let buff of this.board[x][y].buffs) {
+        parent = this.$refs[`structure-${buff.parent[0]}-${buff.parent[1]}`][0]
+        val = buff.buffFunc(val, parent);
+      }
       this.points += val;
     },
     buyStructure(structure) {
@@ -152,18 +172,21 @@ export default {
     placeStructure(x,y) {
       let newRow = [...this.board[x]];
       newRow[y].structure = this.placing.name;
-      if (this.placing.buff)
-        this.addBuffs(x,y,this.placing.buff);
+      if (this.placing.buffFunc)
+        this.addBuffs(x,y,this.placing.buffFunc);
       this.$set(this.board, x, newRow);
       this.placing = undefined;
     },
-    addBuffs(x, y, buff) {
+    addBuffs(x, y, buffFunc) {
       let newX, newY;
       for (let dir of cardinalDirs) {
         newX = x + dir[0];
         newY = y + dir[1]; 
         if (this.onBoard(newX, newY))
-          this.board[newX][newY].buffs.push(buff)
+          this.board[newX][newY].buffs.push({
+            buffFunc:buffFunc,
+            parent:[x,y]
+          });
       }
     },
     onBoard(x,y) {
