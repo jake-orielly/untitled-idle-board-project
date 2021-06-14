@@ -25,18 +25,18 @@
             >
               <td
                 v-for="(col, colVal) in columns"
-                :key="`cell-${colVal}-${rowVal}`"
-                @click="selectStructure(colVal, rowVal)"
+                :key="`cell-${rowVal}-${colVal}`"
+                @click="selectStructure(rowVal, colVal)"
               >
                 <component 
-                  :is="board[colVal][rowVal].structure"
-                  :ref="'structure-' + colVal + '-' + rowVal"
+                  :is="board[rowVal][colVal].structure"
+                  :ref="'structure-' + rowVal + '-' + colVal"
                   :tick="tick"
-                  @gainPoints="(val) => gainPoints(colVal, rowVal, val)"
+                  @gainPoints="(val) => gainPoints(rowVal, colVal, val)"
                 />
                 <div
-                  v-if="!board[colVal][rowVal].structure && placing"
-                  @click="placeStructure(colVal, rowVal)"
+                  v-if="!board[rowVal][colVal].structure && placing"
+                  @click="placeStructure(rowVal, colVal)"
                   class="empty-space"
                 >
                   {{placing.img}}
@@ -69,6 +69,7 @@
         <UpgradesTab
           v-else-if="rightTab == 'upgrades'"
           :upgrades="upgrades"
+          @buyUpgrade="buyUpgrade"
         />
       </div>
     </div>
@@ -82,6 +83,7 @@ const cardinalDirs = [
   [0,-1],
   [-1,0]
 ];
+
 
 import structureRepresentations from '../js/structureDescriptors'
 
@@ -117,7 +119,21 @@ export default {
       placingCost: undefined,
       selectedStructure: undefined,
       rightTab: "details",
-      upgrades: []
+      upgrades: [
+        {
+          name: "Extra Column",
+          cost: 30,
+          bought: false,
+          func: () => {
+            this.columns++;
+            for (let i = 0; i < this.rows; i++)
+              this.board[i][this.columns - 1] = {
+                structure: undefined,
+                buffs:[]
+              };
+          }
+        }
+      ]
     }
   },
   created() {
@@ -157,6 +173,14 @@ export default {
           name: structure.name,
           action: "Buying"
         };
+      }
+    },
+    buyUpgrade(upgrade) {
+      let upgradeCost = upgrade.cost;
+      if (this.points >= upgradeCost) {
+        this.points -= upgradeCost;
+        upgrade.func();
+        upgrade.bought = true;
       }
     },
     selectStructure(x,y) {
