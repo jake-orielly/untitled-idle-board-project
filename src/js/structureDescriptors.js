@@ -4,7 +4,7 @@ const clickerButton = {
       return 3 + parseInt(Math.pow(1.5 * owned, 1.25)); 
     },
     img: ":)",
-    owned: 0
+    owned: 1
   }
   
 const generator = {

@@ -1,13 +1,17 @@
 <template>
   <div>
-    <p
+    <div
       v-if="structure"
     >
-      {{structure.action}}: 
-      <span>
-        {{structure.name}}
-      </span>
-    </p>
+      <p>
+        {{structure.action}}: {{structure.name}}
+      </p>
+      <button
+        @click="$emit('deleteStructure')"
+      >
+        Delete
+      </button>
+    </div>
     <p
       v-else
     >

@@ -65,6 +65,7 @@
         <StructureDetails 
           v-if="rightTab == 'details'"
           :structure="selectedStructure"
+          @deleteStructure="deleteStructure"
         />
         <UpgradesTab
           v-else-if="rightTab == 'upgrades'"
@@ -200,8 +201,18 @@ export default {
     selectStructure(x,y) {
       this.selectedStructure = {
         name: this.board[x][y].structure,
-        action: "Selected"
+        action: "Selected",
+        x: x,
+        y: y
       };
+    },
+    deleteStructure() {
+      const selected = this.selectedStructure;
+      this.board[selected.x][selected.y].structure = undefined;
+      this.structures.find(
+        s => s.name == selected.name
+      ).owned--;
+      this.selectedStructure = undefined;
     },
     selectRightTab(tab) {
       this.rightTab = tab;
