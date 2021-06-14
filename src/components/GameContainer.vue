@@ -132,6 +132,20 @@ export default {
                 buffs:[]
               };
           }
+        },
+        {
+          name: "Extra Row",
+          cost: 30,
+          bought: false,
+          func: () => {
+            this.rows++;
+            this.board.push([]);
+            for (let j = 0; j < this.columns; j++)
+              this.board[this.board.length - 1][j] = {
+                structure: undefined,
+                buffs:[]
+              };
+          }
         }
       ]
     }
@@ -165,7 +179,7 @@ export default {
       let structPrice = structure.price(structure.owned);
       if (this.placingCost)
         this.points += this.placingCost;
-      if (this.points > structPrice) {
+      if (this.points >= structPrice) {
         this.points -= structPrice;
         this.placing = structure;
         this.placingCost = structPrice;
